@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Registro de Exámenes</title>
+<link rel="stylesheet" href="css/styles.css?v=1">
+</head>
+<body>
+  <header class="header">
+    <h1>Registro de Exámenes</h1>
+    <p class="subtitulo">Escuela Técnica Álvaro Obregón Monterrey Uno</p>
+  </header>
+
+  <main class="contenedor">
+    <section class="panel panel-form">
+      <h2>Nuevo registro</h2>
+      <form id="form-registro" class="form-registro">
+        <div class="campo">
+          <label for="input-carrera">Carrera</label>
+          <input type="text" id="input-carrera" list="lista-carreras" placeholder="Ej. Técnico en Informática" required>
+          <datalist id="lista-carreras"></datalist>
+        </div>
+        <div class="campo">
+          <label for="input-materia">Materia</label>
+          <input type="text" id="input-materia" list="lista-materias" placeholder="Ej. Programación I" required>
+          <datalist id="lista-materias"></datalist>
+        </div>
+        <div class="campo">
+          <label for="select-tipo">Tipo de examen</label>
+          <select id="select-tipo" required>
+            <option value="" disabled selected>Selecciona</option>
+            <option value="A">Tipo A</option>
+            <option value="B">Tipo B</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primario">Agregar registro</button>
+      </form>
+      <p id="estado-conexion" class="estado-conexion"></p>
+    </section>
+
+    <section class="panel panel-tabla">
+      <div class="tabla-header">
+        <h2>Registros</h2>
+        <div class="filtros">
+          <select id="filtro-carrera">
+            <option value="">Todas las carreras</option>
+          </select>
+          <select id="filtro-tipo">
+            <option value="">Todos los tipos</option>
+            <option value="A">Tipo A</option>
+            <option value="B">Tipo B</option>
+          </select>
+          <select id="filtro-estado">
+            <option value="">Todos los estados</option>
+            <option value="entregado">Entregado</option>
+            <option value="pendiente">Pendiente</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="tabla-scroll">
+        <table class="tabla-registros">
+          <thead>
+            <tr>
+              <th>Carrera</th>
+              <th>Materia</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Fecha y hora de entrega</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tabla-registros-body"></tbody>
+        </table>
+      </div>
+      <p id="contador-registros" class="contador"></p>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>Registro de Exámenes — Escuela Técnica Álvaro Obregón Monterrey Uno</p>
+  </footer>
+
+  <script type="module" src="js/app.js?v=1"></script>
+</body>
+</html>

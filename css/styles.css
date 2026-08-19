@@ -1,0 +1,249 @@
+:root {
+  --azul-oscuro: #0f2a4a;
+  --azul: #1d4e8f;
+  --azul-claro: #e8f0fb;
+  --gris-texto: #33404f;
+  --gris-borde: #d7dee7;
+  --gris-fondo: #f4f7fb;
+  --verde: #1d8a4c;
+  --verde-fondo: #e4f6ec;
+  --ambar: #b3760c;
+  --ambar-fondo: #fbf1de;
+  --blanco: #ffffff;
+  --radio: 10px;
+  --sombra: 0 1px 3px rgba(15, 42, 74, 0.08), 0 1px 2px rgba(15, 42, 74, 0.06);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--gris-fondo);
+  color: var(--gris-texto);
+}
+
+.header {
+  background: var(--azul-oscuro);
+  color: var(--blanco);
+  padding: 28px 24px;
+  text-align: center;
+}
+
+.header h1 {
+  margin: 0 0 4px;
+  font-size: 1.6rem;
+}
+
+.subtitulo {
+  margin: 0;
+  color: #c7d6ec;
+  font-size: 0.95rem;
+}
+
+.contenedor {
+  max-width: 1100px;
+  margin: 28px auto;
+  padding: 0 20px;
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 800px) {
+  .contenedor {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panel {
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 20px;
+}
+
+.panel h2 {
+  margin: 0 0 16px;
+  font-size: 1.1rem;
+  color: var(--azul-oscuro);
+}
+
+.form-registro {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.campo {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.campo label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gris-texto);
+}
+
+.campo input,
+.campo select,
+.filtros select {
+  padding: 9px 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: var(--blanco);
+  color: var(--gris-texto);
+}
+
+.campo input:focus,
+.campo select:focus {
+  outline: 2px solid var(--azul);
+  outline-offset: 1px;
+}
+
+.btn-primario {
+  margin-top: 4px;
+  padding: 10px 16px;
+  background: var(--azul);
+  color: var(--blanco);
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primario:hover {
+  background: var(--azul-oscuro);
+}
+
+.estado-conexion {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: var(--ambar);
+}
+
+.tabla-header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.filtros {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tabla-scroll {
+  overflow-x: auto;
+}
+
+.tabla-registros {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tabla-registros th {
+  text-align: left;
+  padding: 10px 12px;
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.tabla-registros td {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--gris-borde);
+  vertical-align: middle;
+}
+
+.tabla-registros tr.fila-entregada {
+  background: var(--verde-fondo);
+}
+
+.badge {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.badge-tipo-A {
+  background: var(--azul-claro);
+  color: var(--azul);
+}
+
+.badge-tipo-B {
+  background: #f1e8fb;
+  color: #6b2fa3;
+}
+
+.badge-entregado {
+  background: var(--verde-fondo);
+  color: var(--verde);
+}
+
+.badge-pendiente {
+  background: var(--ambar-fondo);
+  color: var(--ambar);
+}
+
+.acciones {
+  white-space: nowrap;
+  display: flex;
+  gap: 6px;
+}
+
+.btn-toggle,
+.btn-eliminar {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--gris-borde);
+  background: var(--blanco);
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.btn-toggle:hover {
+  border-color: var(--azul);
+  color: var(--azul);
+}
+
+.btn-eliminar {
+  color: #b3261e;
+}
+
+.btn-eliminar:hover {
+  background: #fdeceb;
+  border-color: #b3261e;
+}
+
+.contador {
+  margin: 12px 0 0;
+  font-size: 0.8rem;
+  color: #6a7686;
+}
+
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #8a94a3;
+  font-size: 0.8rem;
+}
