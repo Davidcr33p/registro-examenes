@@ -1,0 +1,27 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Catálogo de carreras y materias: nombres de materias, no son datos
+    // sensibles. Abierto para que el panel de administración (admin.html)
+    // se pueda usar para cargar la primera carrera antes de que exista
+    // ninguna cuenta de maestro (y para que el selector de carrera del
+    // registro de cuentas funcione antes de iniciar sesión).
+    match /carreras/{carreraId} {
+      allow read, write: if true;
+    }
+
+    // Registros de exámenes: solo maestros con sesión iniciada.
+    match /registros/{registroId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && request.resource.data.maestroId == request.auth.uid;
+      allow update, delete: if request.auth != null;
+    }
+
+    // Perfiles de maestro: cada quien lee/edita solo el suyo; cualquier
+    // maestro logueado puede leer los demás (para futuros usos, ej. listas).
+    match /maestros/{maestroId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == maestroId;
+    }
+  }
+}

@@ -1,4 +1,3 @@
-import { alCambiarSesion } from "./auth.js";
 import { escucharCarreras, crearCarrera, agregarMateria, quitarMateria, eliminarCarrera } from "./carreras.js";
 
 const vistaCargando = document.getElementById("vista-admin-cargando");
@@ -7,14 +6,11 @@ const formNuevaCarrera = document.getElementById("form-nueva-carrera");
 const inputNuevaCarrera = document.getElementById("input-nueva-carrera");
 const listaCarrerasAdmin = document.getElementById("lista-carreras-admin");
 
-alCambiarSesion((user) => {
-  if (!user || !user.emailVerified) {
-    window.location.href = "index.html";
-    return;
-  }
-  vistaCargando.classList.add("oculto");
-  vistaAdmin.classList.remove("oculto");
-});
+// El catálogo de carreras/materias es de acceso abierto (ver firestore.rules)
+// a propósito: así se puede cargar la primera carrera antes de que exista
+// ninguna cuenta de maestro, sin depender de haber iniciado sesión.
+vistaCargando.classList.add("oculto");
+vistaAdmin.classList.remove("oculto");
 
 formNuevaCarrera.addEventListener("submit", async (e) => {
   e.preventDefault();

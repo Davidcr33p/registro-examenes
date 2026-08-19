@@ -16,7 +16,9 @@ js/auth.js                Registro, login, logout, verificación de correo
 js/carreras.js            Lectura/escritura del catálogo de carreras y materias
 js/firebase.js            Inicializa Firebase (app, Firestore, Auth) para todo el sitio
 js/firebase-config.js     Configuración de tu proyecto de Firebase (ya está completada)
-js/auth-config.js         Dominio de correo institucional permitido (hay que completarlo)
+js/auth-config.js         Dominio de correo institucional permitido (ya está completado)
+firestore.rules            Reglas de seguridad de Firestore (versionadas, se despliegan con la CLI)
+firebase.json / .firebaserc Configuración de la Firebase CLI para este proyecto
 ```
 
 ## 1. Firebase — Firestore y Authentication
@@ -39,39 +41,28 @@ Esto se usa para validar, al momento de crear una cuenta, que el correo termine 
 
 ## 3. Cargar el catálogo de carreras y materias
 
-Entra a `admin.html` (con cualquier cuenta ya verificada) y ahí puedes:
+Entra a `admin.html` (no requiere sesión iniciada, a propósito — ver más abajo) y ahí puedes:
 
 - Agregar una carrera.
 - Agregar/quitar las materias que le pertenecen a esa carrera.
 
 Ese catálogo es lo que alimenta: el selector de carrera al crear una cuenta, el selector de materia al registrar un examen (filtrado según la carrera del maestro), y el filtro de carreras en la tabla.
 
-## 4. Reglas de Firestore (recomendado)
+## 4. Reglas de Firestore
 
-En **Firestore Database > Reglas**, reemplaza el modo de prueba (expira 30 días después de creado) por esto, que exige estar logueado para leer o escribir:
+Las reglas viven versionadas en [`firestore.rules`](firestore.rules) y se despliegan con la Firebase CLI (ya autenticada en esta máquina):
 
 ```
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    match /registros/{registroId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.maestroId == request.auth.uid;
-      allow update, delete: if request.auth != null;
-    }
-    match /carreras/{carreraId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null;
-    }
-    match /maestros/{maestroId} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == maestroId;
-    }
-  }
-}
+firebase deploy --only firestore:rules --project registro-examenes-eiao
 ```
 
-Con esto cualquier maestro logueado puede administrar el catálogo de carreras/materias (no hay todavía un rol de "administrador" separado). Si más adelante quieres que solo tú puedas editar el catálogo, se puede agregar un rol de administrador (custom claims) — avísame cuando lo necesites.
+Resumen de qué protege cada colección:
+
+- **`carreras`** (nombres de carreras/materias): lectura y escritura abiertas a propósito, sin requerir sesión. Es la única forma de romper el problema del huevo y la gallina — para crear una cuenta hace falta elegir una carrera de la lista, así que tiene que ser posible cargar la primera carrera antes de que exista ningún maestro registrado. No son datos sensibles (solo nombres de carrera/materia), así que dejarlo abierto es un riesgo bajo para un uso interno de escuela.
+- **`registros`** (los exámenes): requieren sesión iniciada para leer o escribir.
+- **`maestros`** (perfiles): cada quien solo puede escribir su propio perfil.
+
+Si más adelante se quiere restringir quién edita el catálogo (un rol de "administrador" separado de los maestros), se puede agregar con custom claims — avísame cuando haga falta.
 
 ## 5. Probar localmente
 
