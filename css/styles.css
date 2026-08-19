@@ -247,3 +247,230 @@ body {
   color: #8a94a3;
   font-size: 0.8rem;
 }
+
+.oculto {
+  display: none !important;
+}
+
+/* --- Barra de sesión (header) --- */
+
+.barra-sesion {
+  margin-top: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+}
+
+.barra-sesion span {
+  color: #c7d6ec;
+}
+
+.link-admin {
+  color: var(--blanco);
+  text-decoration: underline;
+  font-size: 0.85rem;
+}
+
+.btn-secundario {
+  padding: 8px 14px;
+  background: transparent;
+  border: 1px solid #4a6b96;
+  color: var(--blanco);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.btn-secundario:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* En el panel de verificación el botón secundario vive sobre fondo blanco */
+.panel-auth .btn-secundario {
+  color: var(--azul);
+  border-color: var(--gris-borde);
+}
+
+.panel-auth .btn-secundario:hover {
+  background: var(--azul-claro);
+}
+
+/* --- Login / crear cuenta / verificación --- */
+
+.contenedor-auth {
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.panel-auth h2 {
+  margin: 0 0 12px;
+  font-size: 1.1rem;
+  color: var(--azul-oscuro);
+}
+
+.panel-auth p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.tabs-auth {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 18px;
+  border-bottom: 1px solid var(--gris-borde);
+}
+
+.tab-auth {
+  flex: 1;
+  padding: 10px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #6a7686;
+  cursor: pointer;
+}
+
+.tab-auth.activo {
+  color: var(--azul);
+  border-bottom-color: var(--azul);
+}
+
+.form-auth {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.mensaje-auth {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #b3261e;
+  min-height: 1.1em;
+}
+
+.hint {
+  font-size: 0.78rem;
+  color: #6a7686;
+}
+
+.carrera-actual {
+  margin: 0;
+  padding: 9px 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  background: var(--azul-claro);
+  color: var(--azul-oscuro);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+/* --- Panel de administración de catálogo --- */
+
+.contenedor-admin {
+  max-width: 900px;
+  margin: 28px auto;
+  padding: 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-inline {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.form-inline input {
+  flex: 1;
+  min-width: 200px;
+  padding: 9px 10px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.lista-carreras-admin {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.tarjeta-carrera {
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.tarjeta-carrera-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tarjeta-carrera-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--azul-oscuro);
+}
+
+.lista-materias {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.lista-materias li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 6px 10px;
+  background: var(--gris-fondo);
+  border-radius: 6px;
+  font-size: 0.88rem;
+}
+
+.lista-materias li button {
+  background: none;
+  border: none;
+  color: #b3261e;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.lista-materias-vacia {
+  color: #6a7686;
+  font-style: italic;
+  justify-content: flex-start !important;
+}
+
+.form-nueva-materia {
+  display: flex;
+  gap: 8px;
+}
+
+.form-nueva-materia input {
+  flex: 1;
+  padding: 7px 9px;
+  border: 1px solid var(--gris-borde);
+  border-radius: 6px;
+  font-size: 0.88rem;
+  font-family: inherit;
+}

@@ -1,7 +1,15 @@
-import { firebaseConfig } from "./firebase-config.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { db, auth } from "./firebase.js";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js";
 import {
-  getFirestore,
+  registrarMaestro,
+  iniciarSesion,
+  cerrarSesion,
+  reenviarVerificacion,
+  obtenerPerfilMaestro,
+  alCambiarSesion
+} from "./auth.js";
+import { escucharCarreras } from "./carreras.js";
+import {
   collection,
   addDoc,
   onSnapshot,
@@ -13,17 +21,37 @@ import {
   orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 const registrosRef = collection(db, "registros");
 
+// --- Vistas ---
+const vistaAuth = document.getElementById("vista-auth");
+const vistaVerificacion = document.getElementById("vista-verificacion");
+const vistaApp = document.getElementById("vista-app");
+const barraSesion = document.getElementById("barra-sesion");
+const textoSesion = document.getElementById("texto-sesion");
+
+// --- Auth: login/signup ---
+const tabsAuth = document.querySelectorAll(".tab-auth");
+const formLogin = document.getElementById("form-login");
+const formSignup = document.getElementById("form-signup");
+const mensajeLogin = document.getElementById("mensaje-login");
+const mensajeSignup = document.getElementById("mensaje-signup");
+const signupCarrera = document.getElementById("signup-carrera");
+const btnCerrarSesion = document.getElementById("btn-cerrar-sesion");
+const btnReenviar = document.getElementById("btn-reenviar");
+const btnYaVerifique = document.getElementById("btn-ya-verifique");
+const btnSalirVerificacion = document.getElementById("btn-salir-verificacion");
+const mensajeVerificacion = document.getElementById("mensaje-verificacion");
+const hintDominio = document.getElementById("hint-dominio");
+
+hintDominio.textContent = `Debe terminar en ${DOMINIO_INSTITUCIONAL}`;
+
+// --- App: formulario y tabla ---
 const form = document.getElementById("form-registro");
-const inputCarrera = document.getElementById("input-carrera");
-const inputMateria = document.getElementById("input-materia");
+const carreraActualEl = document.getElementById("carrera-actual");
+const selectMateria = document.getElementById("select-materia");
 const selectTipo = document.getElementById("select-tipo");
 const tbody = document.getElementById("tabla-registros-body");
-const datalistCarreras = document.getElementById("lista-carreras");
-const datalistMaterias = document.getElementById("lista-materias");
 const filtroCarrera = document.getElementById("filtro-carrera");
 const filtroTipo = document.getElementById("filtro-tipo");
 const filtroEstado = document.getElementById("filtro-estado");
@@ -31,37 +59,190 @@ const contador = document.getElementById("contador-registros");
 const estadoConexion = document.getElementById("estado-conexion");
 
 let registros = [];
+let carreras = [];
+let perfilActual = null;
 
+// --- Tabs login / crear cuenta ---
+tabsAuth.forEach((tab) => {
+  tab.addEventListener("click", () => {
+    tabsAuth.forEach((t) => t.classList.remove("activo"));
+    tab.classList.add("activo");
+    const esLogin = tab.dataset.tab === "login";
+    formLogin.classList.toggle("oculto", !esLogin);
+    formSignup.classList.toggle("oculto", esLogin);
+  });
+});
+
+// --- Catálogo de carreras: alimenta el select del registro y los filtros ---
+escucharCarreras((lista) => {
+  carreras = lista;
+
+  const valorSignup = signupCarrera.value;
+  signupCarrera.innerHTML =
+    '<option value="" disabled selected>Selecciona tu carrera</option>' +
+    carreras.map((c) => `<option value="${c.id}">${escapeHtml(c.nombre)}</option>`).join("");
+  if (carreras.some((c) => c.id === valorSignup)) signupCarrera.value = valorSignup;
+
+  const valorFiltro = filtroCarrera.value;
+  filtroCarrera.innerHTML =
+    '<option value="">Todas las carreras</option>' +
+    carreras.map((c) => `<option value="${escapeHtml(c.nombre)}">${escapeHtml(c.nombre)}</option>`).join("");
+  filtroCarrera.value = valorFiltro;
+
+  actualizarSelectMateria();
+});
+
+function actualizarSelectMateria() {
+  if (!perfilActual) return;
+  const carrera = carreras.find((c) => c.id === perfilActual.carreraId);
+  const materias = carrera ? carrera.materias || [] : [];
+  const valorActual = selectMateria.value;
+  selectMateria.innerHTML =
+    '<option value="" disabled selected>Selecciona una materia</option>' +
+    materias.map((m) => `<option value="${escapeHtml(m)}">${escapeHtml(m)}</option>`).join("");
+  if (materias.includes(valorActual)) selectMateria.value = valorActual;
+}
+
+// --- Crear cuenta ---
+formSignup.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  mensajeSignup.textContent = "";
+  const nombre = document.getElementById("signup-nombre").value.trim();
+  const email = document.getElementById("signup-email").value.trim();
+  const carreraId = signupCarrera.value;
+  const password = document.getElementById("signup-password").value;
+  const password2 = document.getElementById("signup-password2").value;
+
+  if (password !== password2) {
+    mensajeSignup.textContent = "Las contraseñas no coinciden.";
+    return;
+  }
+  const carrera = carreras.find((c) => c.id === carreraId);
+  if (!carrera) {
+    mensajeSignup.textContent = "Selecciona tu carrera.";
+    return;
+  }
+
+  try {
+    await registrarMaestro({ nombre, email, password, carreraId, carreraNombre: carrera.nombre });
+  } catch (err) {
+    mensajeSignup.textContent = traducirErrorAuth(err);
+  }
+});
+
+// --- Iniciar sesión ---
+formLogin.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  mensajeLogin.textContent = "";
+  const email = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  try {
+    await iniciarSesion(email, password);
+  } catch (err) {
+    mensajeLogin.textContent = traducirErrorAuth(err);
+  }
+});
+
+btnCerrarSesion.addEventListener("click", () => cerrarSesion());
+btnSalirVerificacion.addEventListener("click", () => cerrarSesion());
+
+btnReenviar.addEventListener("click", async () => {
+  await reenviarVerificacion();
+  mensajeVerificacion.textContent = "Correo reenviado.";
+});
+
+btnYaVerifique.addEventListener("click", async () => {
+  await auth.currentUser.reload();
+  if (auth.currentUser.emailVerified) {
+    perfilActual = await obtenerPerfilMaestro(auth.currentUser.uid);
+    mostrarVistaApp();
+  } else {
+    mensajeVerificacion.textContent = "Todavía no detectamos la verificación. Revisa tu correo (y spam).";
+  }
+});
+
+function traducirErrorAuth(err) {
+  const codigo = err.code || "";
+  if (codigo.includes("email-already-in-use")) return "Ese correo ya tiene una cuenta.";
+  if (codigo.includes("invalid-email")) return "Correo inválido.";
+  if (codigo.includes("weak-password")) return "La contraseña debe tener al menos 6 caracteres.";
+  if (
+    codigo.includes("user-not-found") ||
+    codigo.includes("wrong-password") ||
+    codigo.includes("invalid-credential")
+  )
+    return "Correo o contraseña incorrectos.";
+  return err.message || "Ocurrió un error.";
+}
+
+// --- Cambios de sesión: controla qué vista se muestra ---
+alCambiarSesion(async (user) => {
+  ocultarTodo();
+  if (!user) {
+    vistaAuth.classList.remove("oculto");
+    barraSesion.classList.add("oculto");
+    perfilActual = null;
+    return;
+  }
+  if (!user.emailVerified) {
+    vistaVerificacion.classList.remove("oculto");
+    barraSesion.classList.add("oculto");
+    return;
+  }
+  perfilActual = await obtenerPerfilMaestro(user.uid);
+  mostrarVistaApp();
+});
+
+function ocultarTodo() {
+  vistaAuth.classList.add("oculto");
+  vistaVerificacion.classList.add("oculto");
+  vistaApp.classList.add("oculto");
+}
+
+function mostrarVistaApp() {
+  ocultarTodo();
+  vistaApp.classList.remove("oculto");
+  barraSesion.classList.remove("oculto");
+  if (perfilActual) {
+    textoSesion.textContent = `${perfilActual.nombre} — ${perfilActual.carreraNombre}`;
+    carreraActualEl.textContent = perfilActual.carreraNombre;
+    actualizarSelectMateria();
+  }
+}
+
+// --- Nuevo registro ---
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  const carrera = inputCarrera.value.trim();
-  const materia = inputMateria.value.trim();
+  if (!perfilActual || !auth.currentUser) return;
+  const materia = selectMateria.value;
   const tipo = selectTipo.value;
-  if (!carrera || !materia || !tipo) return;
+  if (!materia || !tipo) return;
 
   try {
     await addDoc(registrosRef, {
-      carrera,
+      carrera: perfilActual.carreraNombre,
+      carreraId: perfilActual.carreraId,
       materia,
       tipo,
       entregado: false,
       fechaEntrega: null,
-      creadoEn: serverTimestamp()
+      creadoEn: serverTimestamp(),
+      maestroId: auth.currentUser.uid,
+      maestroNombre: perfilActual.nombre
     });
     form.reset();
-    inputCarrera.focus();
   } catch (err) {
     mostrarError(err);
   }
 });
 
+// --- Tabla de registros (en tiempo real) ---
 const q = query(registrosRef, orderBy("creadoEn", "desc"));
 onSnapshot(
   q,
   (snapshot) => {
     estadoConexion.textContent = "";
     registros = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    actualizarFiltros();
     render();
   },
   (err) => mostrarError(err)
@@ -88,28 +269,7 @@ async function eliminarRegistro(id) {
 
 function formatearFecha(timestamp) {
   if (!timestamp || typeof timestamp.toDate !== "function") return "—";
-  return timestamp.toDate().toLocaleString("es-MX", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  });
-}
-
-function actualizarFiltros() {
-  const carrerasUnicas = [...new Set(registros.map((r) => r.carrera))].sort();
-  const materiasUnicas = [...new Set(registros.map((r) => r.materia))].sort();
-
-  datalistCarreras.innerHTML = carrerasUnicas
-    .map((c) => `<option value="${escapeHtml(c)}">`)
-    .join("");
-  datalistMaterias.innerHTML = materiasUnicas
-    .map((m) => `<option value="${escapeHtml(m)}">`)
-    .join("");
-
-  const valorActual = filtroCarrera.value;
-  filtroCarrera.innerHTML =
-    '<option value="">Todas las carreras</option>' +
-    carrerasUnicas.map((c) => `<option value="${escapeHtml(c)}">${escapeHtml(c)}</option>`).join("");
-  filtroCarrera.value = carrerasUnicas.includes(valorActual) ? valorActual : "";
+  return timestamp.toDate().toLocaleString("es-MX", { dateStyle: "medium", timeStyle: "short" });
 }
 
 function render() {
@@ -125,7 +285,12 @@ function render() {
     return true;
   });
 
-  tbody.innerHTML = filtrados
+  // Pendientes arriba, entregados abajo. Como `registros` ya viene ordenado
+  // por fecha de creación (desc) desde Firestore, un sort estable por
+  // "entregado" conserva ese orden dentro de cada grupo.
+  const ordenados = [...filtrados].sort((a, b) => Number(a.entregado) - Number(b.entregado));
+
+  tbody.innerHTML = ordenados
     .map(
       (r) => `
     <tr class="${r.entregado ? "fila-entregada" : ""}">
@@ -153,12 +318,8 @@ function render() {
 tbody.addEventListener("click", (e) => {
   const btnToggle = e.target.closest(".btn-toggle");
   const btnEliminar = e.target.closest(".btn-eliminar");
-  if (btnToggle) {
-    marcarEntregado(btnToggle.dataset.id, btnToggle.dataset.entregado === "true");
-  }
-  if (btnEliminar) {
-    eliminarRegistro(btnEliminar.dataset.id);
-  }
+  if (btnToggle) marcarEntregado(btnToggle.dataset.id, btnToggle.dataset.entregado === "true");
+  if (btnEliminar) eliminarRegistro(btnEliminar.dataset.id);
 });
 
 [filtroCarrera, filtroTipo, filtroEstado].forEach((el) => el.addEventListener("change", render));

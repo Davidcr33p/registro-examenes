@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Administrar catálogo — Registro de Exámenes</title>
+<link rel="stylesheet" href="css/styles.css?v=2">
+</head>
+<body>
+  <header class="header">
+    <h1>Administrar carreras y materias</h1>
+    <p class="subtitulo">Escuela Técnica Álvaro Obregón Monterrey Uno</p>
+    <div class="barra-sesion">
+      <a href="index.html" class="link-admin">← Volver al registro</a>
+    </div>
+  </header>
+
+  <main class="contenedor-admin" id="vista-admin-cargando">
+    <p class="estado-conexion">Cargando…</p>
+  </main>
+
+  <main class="contenedor-admin oculto" id="vista-admin">
+    <section class="panel">
+      <h2>Nueva carrera</h2>
+      <p class="hint">Cada materia que agregues aquí es la que verán los maestros de esa carrera al registrar un examen.</p>
+      <form id="form-nueva-carrera" class="form-inline">
+        <input type="text" id="input-nueva-carrera" placeholder="Nombre de la carrera" required>
+        <button type="submit" class="btn-primario">Agregar carrera</button>
+      </form>
+    </section>
+
+    <section id="lista-carreras-admin" class="lista-carreras-admin"></section>
+  </main>
+
+  <footer class="footer">
+    <p>Registro de Exámenes — Escuela Técnica Álvaro Obregón Monterrey Uno</p>
+  </footer>
+
+  <script type="module" src="js/admin.js?v=1"></script>
+</body>
+</html>
