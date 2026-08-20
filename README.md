@@ -1,6 +1,6 @@
 # Registro de Exámenes
 
-Registro de exámenes por carrera técnica y materia — Escuela Técnica Álvaro Obregón Monterrey Uno.
+Registro de exámenes por carrera técnica y materia — Escuela Técnica Álvaro Obregón Monterrey I.
 
 Cada maestro se registra con su **correo institucional** y su **carrera**. Al crear un registro solo ve las **materias de su propia carrera**, elige el **tipo de examen (A o B)**, y cuando lo marca como entregado se guarda automáticamente la **fecha y hora** (no se escribe a mano). La tabla muestra primero los **pendientes** y hasta abajo los **entregados**. Los datos viven en una base de datos compartida (Firebase Firestore + Authentication), en tiempo real, para que cualquier maestro pueda entrar desde cualquier dispositivo.
 
