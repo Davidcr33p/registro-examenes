@@ -4,6 +4,8 @@ Registro de exámenes por carrera técnica y materia — Escuela Técnica Álvar
 
 Cada maestro se registra con su **correo institucional** y su **carrera**. Al crear un registro solo ve las **materias de su propia carrera**, elige el **tipo de examen (A o B)**, y cuando lo marca como entregado se guarda automáticamente la **fecha y hora** (no se escribe a mano). La tabla muestra primero los **pendientes** y hasta abajo los **entregados**. Los datos viven en una base de datos compartida (Firebase Firestore + Authentication), en tiempo real, para que cualquier maestro pueda entrar desde cualquier dispositivo.
 
+Las cuentas marcadas como **administrador** (colección `admins`, ver más abajo) ven una versión de solo lectura: sin formulario de nuevo registro y sin botones de marcar entregado/eliminar, solo la tabla completa de todas las carreras — pensado para que alguien pueda monitorear a quién le falta entregar sin poder alterar los datos desde la interfaz.
+
 ## Estructura del proyecto
 
 ```
@@ -61,8 +63,9 @@ Resumen de qué protege cada colección:
 - **`carreras`** (nombres de carreras/materias): lectura y escritura abiertas a propósito, sin requerir sesión. Es la única forma de romper el problema del huevo y la gallina — para crear una cuenta hace falta elegir una carrera de la lista, así que tiene que ser posible cargar la primera carrera antes de que exista ningún maestro registrado. No son datos sensibles (solo nombres de carrera/materia), así que dejarlo abierto es un riesgo bajo para un uso interno de escuela.
 - **`registros`** (los exámenes): requieren sesión iniciada para leer o escribir.
 - **`maestros`** (perfiles): cada quien solo puede escribir su propio perfil.
+- **`admins`** (quién ve la vista de solo lectura): un documento por UID. Se agrega/quita a mano — la app no tiene una pantalla para esto. Para agregar un admin hace falta que esa persona ya se haya registrado como maestro (para tener un UID), y luego crear el documento `admins/{uid}` directamente en Firestore.
 
-Si más adelante se quiere restringir quién edita el catálogo (un rol de "administrador" separado de los maestros), se puede agregar con custom claims — avísame cuando haga falta.
+Si más adelante se quiere blindar esto a nivel de reglas (que un admin literalmente no pueda escribir en `registros` aunque llame a la API directo, no solo que la interfaz no se lo permita), se puede agregar — avísame cuando haga falta.
 
 ## 5. Probar localmente
 
