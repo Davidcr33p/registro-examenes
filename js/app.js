@@ -6,6 +6,7 @@ import {
   cerrarSesion,
   reenviarVerificacion,
   obtenerPerfilMaestro,
+  esAdmin,
   alCambiarSesion
 } from "./auth.js";
 import { escucharCarreras } from "./carreras.js";
@@ -47,6 +48,10 @@ const hintDominio = document.getElementById("hint-dominio");
 hintDominio.textContent = `Debe terminar en ${DOMINIO_INSTITUCIONAL}`;
 
 // --- App: formulario y tabla ---
+const contenedorApp = document.querySelector("#vista-app.contenedor");
+const panelForm = document.querySelector(".panel-form");
+const tablaRegistrosEl = document.querySelector(".tabla-registros");
+const avisoAdmin = document.getElementById("aviso-admin");
 const form = document.getElementById("form-registro");
 const carreraActualEl = document.getElementById("carrera-actual");
 const selectMateria = document.getElementById("select-materia");
@@ -61,6 +66,7 @@ const estadoConexion = document.getElementById("estado-conexion");
 let registros = [];
 let carreras = [];
 let perfilActual = null;
+let esAdminActual = false;
 
 // --- Tabs login / crear cuenta ---
 tabsAuth.forEach((tab) => {
@@ -155,6 +161,7 @@ btnYaVerifique.addEventListener("click", async () => {
   await auth.currentUser.reload();
   if (auth.currentUser.emailVerified) {
     perfilActual = await obtenerPerfilMaestro(auth.currentUser.uid);
+    esAdminActual = await esAdmin(auth.currentUser.uid);
     mostrarVistaApp();
   } else {
     mensajeVerificacion.textContent = "Todavía no detectamos la verificación. Revisa tu correo (y spam).";
@@ -190,6 +197,7 @@ alCambiarSesion(async (user) => {
     return;
   }
   perfilActual = await obtenerPerfilMaestro(user.uid);
+  esAdminActual = await esAdmin(user.uid);
   mostrarVistaApp();
 });
 
@@ -203,7 +211,15 @@ function mostrarVistaApp() {
   ocultarTodo();
   vistaApp.classList.remove("oculto");
   barraSesion.classList.remove("oculto");
-  if (perfilActual) {
+
+  contenedorApp.classList.toggle("solo-lectura", esAdminActual);
+  panelForm.classList.toggle("oculto", esAdminActual);
+  tablaRegistrosEl.classList.toggle("solo-lectura", esAdminActual);
+  avisoAdmin.classList.toggle("oculto", !esAdminActual);
+
+  if (esAdminActual) {
+    textoSesion.textContent = `${perfilActual?.nombre || "Cuenta"} — Administrador`;
+  } else if (perfilActual) {
     textoSesion.textContent = `${perfilActual.nombre} — ${perfilActual.carreraNombre}`;
     carreraActualEl.textContent = perfilActual.carreraNombre;
     actualizarSelectMateria();
@@ -213,7 +229,7 @@ function mostrarVistaApp() {
 // --- Nuevo registro ---
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
-  if (!perfilActual || !auth.currentUser) return;
+  if (!perfilActual || !auth.currentUser || esAdminActual) return;
   const materia = selectMateria.value;
   const tipo = selectTipo.value;
   if (!materia || !tipo) return;
@@ -316,6 +332,7 @@ function render() {
 }
 
 tbody.addEventListener("click", (e) => {
+  if (esAdminActual) return;
   const btnToggle = e.target.closest(".btn-toggle");
   const btnEliminar = e.target.closest(".btn-eliminar");
   if (btnToggle) marcarEntregado(btnToggle.dataset.id, btnToggle.dataset.entregado === "true");

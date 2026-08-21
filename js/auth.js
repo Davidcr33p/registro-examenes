@@ -48,6 +48,11 @@ export async function obtenerPerfilMaestro(uid) {
   return snap.exists() ? snap.data() : null;
 }
 
+export async function esAdmin(uid) {
+  const snap = await getDoc(doc(db, "admins", uid));
+  return snap.exists();
+}
+
 export function alCambiarSesion(callback) {
   return onAuthStateChanged(auth, callback);
 }

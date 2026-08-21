@@ -23,5 +23,13 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if request.auth != null && request.auth.uid == maestroId;
     }
+
+    // Lista de administradores (solo cambia qué ve la app: sin formulario
+    // de nuevo registro, tabla de exámenes en modo solo lectura). No abre
+    // acceso a datos que ya no estuviera abierto por las reglas de arriba.
+    match /admins/{adminId} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
   }
 }

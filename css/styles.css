@@ -179,6 +179,27 @@ a {
   }
 }
 
+/* Vista de administrador: solo la tabla, de ancho completo, sin acciones. */
+.contenedor.solo-lectura {
+  grid-template-columns: 1fr;
+}
+
+.tabla-registros.solo-lectura th:last-child,
+.tabla-registros.solo-lectura td:last-child {
+  display: none;
+}
+
+.aviso-admin {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
+  border-radius: var(--radius-sm);
+  color: var(--blue-700);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
 .panel {
   background: var(--white);
   border: 1px solid var(--gray-200);
