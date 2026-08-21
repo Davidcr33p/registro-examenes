@@ -1,4 +1,4 @@
-import { escucharCarreras, crearCarrera, agregarMateria, quitarMateria, eliminarCarrera } from "./carreras.js";
+import { escucharCarreras, crearCarrera, agregarMateria, quitarMateria, eliminarCarrera } from "./carreras.js?v=20260821164021";
 
 const vistaCargando = document.getElementById("vista-admin-cargando");
 const vistaAdmin = document.getElementById("vista-admin");

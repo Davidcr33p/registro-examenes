@@ -1,0 +1,34 @@
+#!/bin/sh
+# Cache-busting automático.
+#
+# GitHub Pages sirve los archivos con "Cache-Control: max-age=600" (10 min)
+# más un ETag, así que un navegador puede quedarse con una copia vieja de
+# un .css/.js hasta por 10 minutos después de cada deploy. La solución es
+# forzar una URL nueva (?v=...) cada vez que el contenido cambia, para que
+# el navegador la trate como un recurso distinto sin importar el caché.
+#
+# Este hook lo hace solo: si el commit toca algún .html/.css/.js del sitio,
+# sincroniza TODAS las referencias (<link>, <script src>, e imports entre
+# módulos JS) al mismo timestamp, para que nunca quede una mezcla de
+# archivo viejo + nuevo servida desde caché.
+
+CHANGED=$(git diff --cached --name-only -- '*.html' 'css/*.css' 'js/*.js')
+if [ -z "$CHANGED" ]; then
+  exit 0
+fi
+
+VERSION=$(date +%Y%m%d%H%M%S)
+
+for f in index.html admin.html; do
+  [ -f "$f" ] || continue
+  sed -i -E "s/\.(css|js)(\?v=[A-Za-z0-9._-]*)?\"/.\1?v=${VERSION}\"/g" "$f"
+  git add "$f"
+done
+
+for f in js/*.js; do
+  [ -f "$f" ] || continue
+  sed -i -E "s#(from \"\./[A-Za-z0-9_-]+\.js)(\?v=[A-Za-z0-9._-]*)?\"#\1?v=${VERSION}\"#g" "$f"
+  git add "$f"
+done
+
+echo "cache-busting: referencias sincronizadas a v=${VERSION}"

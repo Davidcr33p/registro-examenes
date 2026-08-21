@@ -81,6 +81,14 @@ y abre la URL que te indique (normalmente `http://localhost:3000`).
 
 El repositorio ya está conectado a GitHub Pages — cualquier cambio subido a la rama `main` se refleja automáticamente en la URL pública del sitio.
 
+GitHub Pages sirve los archivos con `Cache-Control: max-age=600` (10 minutos) — un navegador puede quedarse hasta 10 min con una copia vieja de un `.css`/`.js` después de cada deploy. Para que eso nunca pase, un **git hook** (`.githooks/pre-commit`) sincroniza automáticamente el `?v=...` de cada `<link>`, `<script src>` e import entre módulos JS a un mismo timestamp, cada vez que un commit toca `.html`/`.css`/`.js` del sitio — no hay que acordarse de subir números a mano. Para que el hook funcione en un clon nuevo del repo, hay que activarlo una vez:
+
+```
+git config core.hooksPath .githooks
+```
+
+(Ya está activado en esta máquina.)
+
 ## Próximos pasos sugeridos
 
 - Cargar el catálogo real de carreras y materias desde `admin.html`.
