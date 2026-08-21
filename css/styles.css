@@ -327,9 +327,11 @@ a {
 
 /* Un registro entregado ya no necesita tanta atención: se apaga en vez de
    resaltarse, para que lo pendiente (lo accionable) sea lo que salte a la
-   vista al escanear la tabla. */
+   vista al escanear la tabla. gray-500 (no gray-400) porque es el tono más
+   claro que todavía da 4.5:1 de contraste sobre blanco — gray-400 se veía
+   casi invisible, sobre todo la fecha de entrega. */
 .tabla-registros tr.fila-entregada td {
-  color: var(--gray-400);
+  color: var(--gray-500);
 }
 
 .badge {
@@ -408,7 +410,7 @@ a {
 .footer {
   text-align: center;
   padding: var(--space-6);
-  color: var(--gray-400);
+  color: var(--gray-500);
   font-size: var(--text-xs);
 }
 
