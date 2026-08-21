@@ -1,5 +1,5 @@
-import { db, auth } from "./firebase.js?v=20260821164021";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260821164021";
+import { db, auth } from "./firebase.js?v=20260821164644";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260821164644";
 import {
   registrarMaestro,
   iniciarSesion,
@@ -8,8 +8,8 @@ import {
   obtenerPerfilMaestro,
   esAdmin,
   alCambiarSesion
-} from "./auth.js?v=20260821164021";
-import { escucharCarreras } from "./carreras.js?v=20260821164021";
+} from "./auth.js?v=20260821164644";
+import { escucharCarreras } from "./carreras.js?v=20260821164644";
 import {
   collection,
   addDoc,

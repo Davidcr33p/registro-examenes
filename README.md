@@ -31,6 +31,8 @@ Firestore ya está creado y configurado (`js/firebase-config.js` tiene tus datos
 2. En la pestaña **Sign-in method**, activa el proveedor **Correo electrónico/contraseña** (Email/Password).
 3. Ve a **Authentication > Settings > Authorized domains** y agrega `davidcr33p.github.io` (para que los links de verificación de correo funcionen bien en el sitio publicado).
 
+**Nota sobre redes escolares/corporativas:** Firestore usa por default una conexión de streaming (WebChannel) que algunos firewalls o proxies de redes institucionales bloquean o interfieren, aunque el resto de la página cargue normal — típicamente se ve como "No se pudo conectar con Firebase" justo al intentar guardar algo. `js/firebase.js` ya inicializa Firestore con `experimentalAutoDetectLongPolling: true`, que detecta esto solo y cambia a long-polling (más compatible, sin penalizar redes donde el streaming normal sí funciona).
+
 ## 2. Dominio de correo institucional
 
 Edita [`js/auth-config.js`](js/auth-config.js) y reemplaza el valor de ejemplo por el dominio real de la escuela:
