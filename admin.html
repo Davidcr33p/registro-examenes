@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Administrar catálogo — Registro de Exámenes</title>
-<link rel="stylesheet" href="css/styles.css?v=20260824142307">
+<title>Administrar academias — Registro de Exámenes</title>
+<link rel="stylesheet" href="css/styles.css?v=20260824145545">
 </head>
 <body>
   <header class="header">
-    <h1>Administrar carreras y materias</h1>
+    <h1>Administrar academias y materias</h1>
     <p class="subtitulo">Escuela Técnica Álvaro Obregón Monterrey I</p>
     <div class="barra-sesion">
       <a href="index.html" class="link-admin">← Volver al registro</a>
@@ -20,22 +20,40 @@
   </main>
 
   <main class="contenedor-admin oculto" id="vista-admin">
+    <section class="panel oculto" id="seccion-periodo">
+      <h2>Generar periodo de exámenes</h2>
+      <p class="hint">
+        Precarga un examen Tipo A y uno Tipo B por cada materia de cada academia, listos para que los maestros los
+        marquen como entregados. Periodo activo actual: <strong id="periodo-actual-texto">—</strong>
+      </p>
+      <form id="form-generar-periodo" class="form-inline">
+        <input type="text" id="input-periodo" placeholder='Ej. "Agosto-Diciembre 2026"' required>
+        <button type="submit" class="btn-primario" id="btn-generar-periodo">Generar exámenes</button>
+      </form>
+      <p class="mensaje-auth" id="mensaje-generar"></p>
+    </section>
+
+    <p class="hint oculto" id="aviso-sin-admin">
+      Para generar un periodo de exámenes, inicia sesión con una cuenta de administrador desde
+      <a href="index.html">el registro principal</a>. El catálogo de academias/materias de abajo se puede editar sin sesión.
+    </p>
+
     <section class="panel">
-      <h2>Nueva carrera</h2>
-      <p class="hint">Cada materia que agregues aquí es la que verán los maestros de esa carrera al registrar un examen.</p>
-      <form id="form-nueva-carrera" class="form-inline">
-        <input type="text" id="input-nueva-carrera" placeholder="Nombre de la carrera" required>
-        <button type="submit" class="btn-primario">Agregar carrera</button>
+      <h2>Nueva academia</h2>
+      <p class="hint">Cada materia que agregues aquí es la que verán los maestros de esa academia al elegir a cuál pertenecen.</p>
+      <form id="form-nueva-academia" class="form-inline">
+        <input type="text" id="input-nueva-academia" placeholder="Nombre de la academia" required>
+        <button type="submit" class="btn-primario">Agregar academia</button>
       </form>
     </section>
 
-    <section id="lista-carreras-admin" class="lista-carreras-admin"></section>
+    <section id="lista-academias-admin" class="lista-academias-admin"></section>
   </main>
 
   <footer class="footer">
     <p>Registro de Exámenes — Escuela Técnica Álvaro Obregón Monterrey I</p>
   </footer>
 
-  <script type="module" src="js/admin.js?v=20260824142307"></script>
+  <script type="module" src="js/admin.js?v=20260824145545"></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
-import { auth, db } from "./firebase.js?v=20260824142307";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824142307";
+import { auth, db } from "./firebase.js?v=20260824145545";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145545";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -14,7 +14,7 @@ export function emailValido(email) {
   return email.toLowerCase().trim().endsWith(DOMINIO_INSTITUCIONAL.toLowerCase());
 }
 
-export async function registrarMaestro({ nombre, email, password, carreraId, carreraNombre }) {
+export async function registrarMaestro({ nombre, email, password, academiaId, academiaNombre }) {
   const correo = email.trim();
   if (!emailValido(correo)) {
     throw new Error(`Usa tu correo institucional (${DOMINIO_INSTITUCIONAL}).`);
@@ -24,8 +24,8 @@ export async function registrarMaestro({ nombre, email, password, carreraId, car
   await setDoc(doc(db, "maestros", cred.user.uid), {
     nombre,
     email: correo,
-    carreraId,
-    carreraNombre
+    academiaId,
+    academiaNombre
   });
   await sendEmailVerification(cred.user);
   return cred.user;

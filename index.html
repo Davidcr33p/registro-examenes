@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Registro de Exámenes</title>
-<link rel="stylesheet" href="css/styles.css?v=20260824142307">
+<link rel="stylesheet" href="css/styles.css?v=20260824145545">
 </head>
 <body>
   <header class="header">
@@ -12,7 +12,7 @@
     <p class="subtitulo">Escuela Técnica Álvaro Obregón Monterrey I</p>
     <div id="barra-sesion" class="barra-sesion oculto">
       <span id="texto-sesion"></span>
-      <a href="admin.html" class="link-admin">Administrar catálogo</a>
+      <a href="admin.html" class="link-admin">Administrar academias</a>
       <button id="btn-cerrar-sesion" class="btn-secundario">Cerrar sesión</button>
     </div>
   </header>
@@ -48,9 +48,9 @@
           <small id="hint-dominio" class="hint"></small>
         </div>
         <div class="campo">
-          <label for="signup-carrera">Carrera a la que perteneces</label>
-          <select id="signup-carrera" required>
-            <option value="" disabled selected>Selecciona tu carrera</option>
+          <label for="signup-academia">Academia a la que perteneces</label>
+          <select id="signup-academia" required>
+            <option value="" disabled selected>Selecciona tu academia</option>
           </select>
         </div>
         <div class="campo">
@@ -78,39 +78,16 @@
     </section>
   </main>
 
-  <main class="contenedor oculto" id="vista-app">
-    <section class="panel panel-form">
-      <h2>Nuevo registro</h2>
-      <form id="form-registro" class="form-registro">
-        <div class="campo">
-          <label>Carrera</label>
-          <p id="carrera-actual" class="carrera-actual"></p>
-        </div>
-        <div class="campo">
-          <label for="select-materia">Materia</label>
-          <select id="select-materia" required>
-            <option value="" disabled selected>Selecciona una materia</option>
-          </select>
-        </div>
-        <div class="campo">
-          <label for="select-tipo">Tipo de examen</label>
-          <select id="select-tipo" required>
-            <option value="" disabled selected>Selecciona</option>
-            <option value="A">Tipo A</option>
-            <option value="B">Tipo B</option>
-          </select>
-        </div>
-        <button type="submit" class="btn-primario">Agregar registro</button>
-      </form>
-      <p id="estado-conexion" class="estado-conexion"></p>
-    </section>
-
+  <main class="contenedor-tabla oculto" id="vista-app">
     <section class="panel panel-tabla">
       <div class="tabla-header">
-        <h2>Registros</h2>
+        <h2>Exámenes</h2>
         <div class="filtros">
-          <select id="filtro-carrera">
-            <option value="">Todas las carreras</option>
+          <select id="filtro-periodo">
+            <option value="">Todos los periodos</option>
+          </select>
+          <select id="filtro-academia">
+            <option value="">Todas las academias</option>
           </select>
           <select id="filtro-tipo">
             <option value="">Todos los tipos</option>
@@ -125,13 +102,14 @@
         </div>
       </div>
 
-      <p id="aviso-admin" class="aviso-admin oculto">Modo administrador: solo lectura, todas las carreras.</p>
+      <p id="aviso-admin" class="aviso-admin oculto">Modo administrador: solo lectura, todas las academias.</p>
+      <p id="estado-conexion" class="estado-conexion"></p>
 
       <div class="tabla-scroll">
         <table class="tabla-registros">
           <thead>
             <tr>
-              <th>Carrera</th>
+              <th>Academia</th>
               <th>Materia</th>
               <th>Tipo</th>
               <th>Estado</th>
@@ -150,6 +128,6 @@
     <p>Registro de Exámenes — Escuela Técnica Álvaro Obregón Monterrey I</p>
   </footer>
 
-  <script type="module" src="js/app.js?v=20260824142307"></script>
+  <script type="module" src="js/app.js?v=20260824145545"></script>
 </body>
 </html>

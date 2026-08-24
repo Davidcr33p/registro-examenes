@@ -163,27 +163,13 @@ a {
 
 /* --- Layout principal --- */
 
-.contenedor {
+.contenedor-tabla {
   max-width: 1120px;
   margin: var(--space-8) auto;
   padding: 0 var(--space-6);
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: var(--space-6);
-  align-items: start;
 }
 
-@media (max-width: 800px) {
-  .contenedor {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* Vista de administrador: solo la tabla, de ancho completo, sin acciones. */
-.contenedor.solo-lectura {
-  grid-template-columns: 1fr;
-}
-
+/* Vista de administrador: sin columna de acciones (es de solo lectura). */
 .tabla-registros.solo-lectura th:last-child,
 .tabla-registros.solo-lectura td:last-child {
   display: none;
@@ -214,14 +200,6 @@ a {
   border-bottom: 1px solid var(--gray-100);
   font-size: var(--text-lg);
   color: var(--gray-900);
-}
-
-/* --- Formulario de nuevo registro --- */
-
-.form-registro {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-4);
 }
 
 .campo {
@@ -503,17 +481,6 @@ a {
   color: var(--gray-500);
 }
 
-.carrera-actual {
-  margin: 0;
-  padding: 10px var(--space-3);
-  border: 1px solid var(--blue-100);
-  border-radius: var(--radius-sm);
-  background: var(--blue-50);
-  color: var(--blue-700);
-  font-weight: 700;
-  font-size: var(--text-base);
-}
-
 /* --- Panel de administración de catálogo --- */
 
 .contenedor-admin {
@@ -547,13 +514,13 @@ a {
   box-shadow: 0 0 0 3px var(--blue-50);
 }
 
-.lista-carreras-admin {
+.lista-academias-admin {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: var(--space-4);
 }
 
-.tarjeta-carrera {
+.tarjeta-academia {
   background: var(--white);
   border: 1px solid var(--gray-200);
   border-radius: var(--radius-md);
@@ -564,7 +531,7 @@ a {
   gap: var(--space-3);
 }
 
-.tarjeta-carrera-header {
+.tarjeta-academia-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -573,7 +540,7 @@ a {
   border-bottom: 1px solid var(--gray-100);
 }
 
-.tarjeta-carrera-header h3 {
+.tarjeta-academia-header h3 {
   margin: 0;
   font-size: var(--text-base);
   color: var(--gray-900);

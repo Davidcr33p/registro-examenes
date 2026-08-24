@@ -1,20 +1,22 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Catálogo de carreras y materias: nombres de materias, no son datos
+    // Catálogo de academias y materias: nombres de materias, no son datos
     // sensibles. Abierto para que el panel de administración (admin.html)
-    // se pueda usar para cargar la primera carrera antes de que exista
-    // ninguna cuenta de maestro (y para que el selector de carrera del
+    // se pueda usar para cargar la primera academia antes de que exista
+    // ninguna cuenta de maestro (y para que el selector de academia del
     // registro de cuentas funcione antes de iniciar sesión).
-    match /carreras/{carreraId} {
+    match /academias/{academiaId} {
       allow read, write: if true;
     }
 
-    // Registros de exámenes: solo maestros con sesión iniciada.
+    // Exámenes precargados por periodo. Los crea/borra solo un admin (es
+    // una acción masiva de "generar periodo"); cualquier maestro logueado
+    // puede leerlos y marcarlos entregado/pendiente.
     match /registros/{registroId} {
       allow read: if request.auth != null;
-      allow create: if request.auth != null && request.resource.data.maestroId == request.auth.uid;
-      allow update, delete: if request.auth != null;
+      allow create, delete: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+      allow update: if request.auth != null;
     }
 
     // Perfiles de maestro: cada quien lee/edita solo el suyo; cualquier
@@ -24,12 +26,19 @@ service cloud.firestore {
       allow write: if request.auth != null && request.auth.uid == maestroId;
     }
 
-    // Lista de administradores (solo cambia qué ve la app: sin formulario
-    // de nuevo registro, tabla de exámenes en modo solo lectura). No abre
-    // acceso a datos que ya no estuviera abierto por las reglas de arriba.
+    // Lista de administradores: pueden generar el periodo de exámenes
+    // (crear/borrar en registros/) y editar config/. La tabla de exámenes
+    // para ellos es de solo lectura del lado de la app, no de las reglas.
     match /admins/{adminId} {
       allow read: if true;
       allow write: if request.auth != null;
+    }
+
+    // Configuración general (ej. periodo activo). Lectura para cualquier
+    // maestro logueado, escritura solo para admins.
+    match /config/{docId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
     }
   }
 }

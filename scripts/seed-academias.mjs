@@ -1,24 +1,24 @@
-// Carga (o recarga) el catálogo real de carreras técnicas y sus materias en
+// Carga (o recarga) el catálogo real de academias técnicas y sus materias en
 // Firestore, a partir del plan de estudios de la Preparatoria Álvaro Obregón
 // — UANL, Unidad Monterrey I (Plantel Churubusco).
 //
-// Solo incluye las materias de especialidad de cada carrera: se excluyen
+// Solo incluye las materias de especialidad de cada academia: se excluyen
 // tanto el Tronco Común (matemáticas, idiomas, orientación, deporte, etc.)
 // como las materias administrativas/genéricas que se repiten igual en las
-// 18 carreras (Introducción a los Procesos Industriales..., Administración,
+// 18 academias (Introducción a los Procesos Industriales..., Administración,
 // Bioética Personalista, Fundamentos de la Solución de Conflictos, Sistemas
 // de Calidad, Formación de Emprendedores) — el usuario pidió "solo las
 // materias técnicas".
 //
-// Uso: node scripts/seed-carreras.mjs
+// Uso: node scripts/seed-academias.mjs
 // Requiere Node 18+ (usa fetch nativo). No necesita credenciales: la
-// colección `carreras` tiene lectura/escritura abierta a propósito
+// colección `academias` tiene lectura/escritura abierta a propósito
 // (ver firestore.rules).
 
 const PROJECT_ID = "registro-examenes-eiao";
 const BASE_URL = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents`;
 
-const carreras = [
+const academias = [
   {
     nombre: "Técnico en Administrador Contable",
     materias: [
@@ -474,13 +474,13 @@ const carreras = [
   }
 ];
 
-function toFirestoreFields(carrera) {
+function toFirestoreFields(academia) {
   return {
     fields: {
-      nombre: { stringValue: carrera.nombre },
+      nombre: { stringValue: academia.nombre },
       materias: {
         arrayValue: {
-          values: carrera.materias.map((m) => ({ stringValue: m }))
+          values: academia.materias.map((m) => ({ stringValue: m }))
         }
       }
     }
@@ -488,17 +488,17 @@ function toFirestoreFields(carrera) {
 }
 
 async function main() {
-  for (const carrera of carreras) {
-    const res = await fetch(`${BASE_URL}/carreras`, {
+  for (const academia of academias) {
+    const res = await fetch(`${BASE_URL}/academias`, {
       method: "POST",
       headers: { "Content-Type": "application/json; charset=utf-8" },
-      body: JSON.stringify(toFirestoreFields(carrera))
+      body: JSON.stringify(toFirestoreFields(academia))
     });
     if (!res.ok) {
-      console.error(`Error en "${carrera.nombre}":`, await res.text());
+      console.error(`Error en "${academia.nombre}":`, await res.text());
       continue;
     }
-    console.log(`OK: ${carrera.nombre} (${carrera.materias.length} materias)`);
+    console.log(`OK: ${academia.nombre} (${academia.materias.length} materias)`);
   }
 }
 
