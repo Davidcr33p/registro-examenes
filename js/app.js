@@ -1,5 +1,5 @@
-import { db, auth } from "./firebase.js?v=20260821164644";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260821164644";
+import { db, auth } from "./firebase.js?v=20260824142307";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824142307";
 import {
   registrarMaestro,
   iniciarSesion,
@@ -8,8 +8,8 @@ import {
   obtenerPerfilMaestro,
   esAdmin,
   alCambiarSesion
-} from "./auth.js?v=20260821164644";
-import { escucharCarreras } from "./carreras.js?v=20260821164644";
+} from "./auth.js?v=20260824142307";
+import { escucharCarreras } from "./carreras.js?v=20260824142307";
 import {
   collection,
   addDoc,
@@ -67,6 +67,7 @@ let registros = [];
 let carreras = [];
 let perfilActual = null;
 let esAdminActual = false;
+let desuscribirRegistros = null;
 
 // --- Tabs login / crear cuenta ---
 tabsAuth.forEach((tab) => {
@@ -189,11 +190,13 @@ alCambiarSesion(async (user) => {
     vistaAuth.classList.remove("oculto");
     barraSesion.classList.add("oculto");
     perfilActual = null;
+    detenerEscuchaRegistros();
     return;
   }
   if (!user.emailVerified) {
     vistaVerificacion.classList.remove("oculto");
     barraSesion.classList.add("oculto");
+    detenerEscuchaRegistros();
     return;
   }
   perfilActual = await obtenerPerfilMaestro(user.uid);
@@ -211,6 +214,7 @@ function mostrarVistaApp() {
   ocultarTodo();
   vistaApp.classList.remove("oculto");
   barraSesion.classList.remove("oculto");
+  iniciarEscuchaRegistros();
 
   contenedorApp.classList.toggle("solo-lectura", esAdminActual);
   panelForm.classList.toggle("oculto", esAdminActual);
@@ -253,16 +257,32 @@ form.addEventListener("submit", async (e) => {
 });
 
 // --- Tabla de registros (en tiempo real) ---
-const q = query(registrosRef, orderBy("creadoEn", "desc"));
-onSnapshot(
-  q,
-  (snapshot) => {
-    estadoConexion.textContent = "";
-    registros = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    render();
-  },
-  (err) => mostrarError(err)
-);
+// Se suscribe solo después de confirmar sesión iniciada (mostrarVistaApp),
+// nunca antes: las reglas de Firestore exigen estar logueado para leer
+// `registros`, así que suscribirse antes de tiempo (ej. justo al cargar la
+// página, mientras el SDK de Auth todavía está restaurando la sesión)
+// producía un error de permisos que no se reintentaba solo hasta recargar.
+function iniciarEscuchaRegistros() {
+  if (desuscribirRegistros) return;
+  const q = query(registrosRef, orderBy("creadoEn", "desc"));
+  desuscribirRegistros = onSnapshot(
+    q,
+    (snapshot) => {
+      estadoConexion.textContent = "";
+      registros = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      render();
+    },
+    (err) => mostrarError(err)
+  );
+}
+
+function detenerEscuchaRegistros() {
+  if (desuscribirRegistros) {
+    desuscribirRegistros();
+    desuscribirRegistros = null;
+  }
+  registros = [];
+}
 
 function mostrarError(err) {
   console.error(err);

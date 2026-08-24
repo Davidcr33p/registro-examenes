@@ -1,4 +1,4 @@
-import { db } from "./firebase.js?v=20260821164644";
+import { db } from "./firebase.js?v=20260824142307";
 import {
   collection,
   doc,
