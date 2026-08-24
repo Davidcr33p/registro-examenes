@@ -1,12 +1,12 @@
-import { db, auth } from "./firebase.js?v=20260824145545";
-import { alCambiarSesion, esAdmin } from "./auth.js?v=20260824145545";
+import { db, auth } from "./firebase.js?v=20260824145926";
+import { alCambiarSesion, esAdmin } from "./auth.js?v=20260824145926";
 import {
   escucharAcademias,
   crearAcademia,
   agregarMateria,
   quitarMateria,
   eliminarAcademia
-} from "./academias.js?v=20260824145545";
+} from "./academias.js?v=20260824145926";
 import {
   collection,
   doc,

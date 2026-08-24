@@ -1,5 +1,5 @@
-import { auth, db } from "./firebase.js?v=20260824145545";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145545";
+import { auth, db } from "./firebase.js?v=20260824145926";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145926";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,

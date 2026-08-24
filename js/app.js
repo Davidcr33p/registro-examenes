@@ -1,5 +1,5 @@
-import { db, auth } from "./firebase.js?v=20260824145545";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145545";
+import { db, auth } from "./firebase.js?v=20260824145926";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145926";
 import {
   registrarMaestro,
   iniciarSesion,
@@ -8,8 +8,8 @@ import {
   obtenerPerfilMaestro,
   esAdmin,
   alCambiarSesion
-} from "./auth.js?v=20260824145545";
-import { escucharAcademias } from "./academias.js?v=20260824145545";
+} from "./auth.js?v=20260824145926";
+import { escucharAcademias } from "./academias.js?v=20260824145926";
 import {
   collection,
   onSnapshot,
@@ -200,6 +200,10 @@ async function mostrarVistaApp() {
 
   tablaRegistrosEl.classList.toggle("solo-lectura", esAdminActual);
   avisoAdmin.classList.toggle("oculto", !esAdminActual);
+  // Un maestro solo ve los exámenes de su propia academia, así que el
+  // filtro de academia (que sirve para navegar entre TODAS) solo tiene
+  // sentido para un admin.
+  filtroAcademia.classList.toggle("oculto", !esAdminActual);
 
   if (esAdminActual) {
     textoSesion.textContent = `${perfilActual?.nombre || "Cuenta"} — Administrador`;
@@ -295,8 +299,11 @@ function render() {
   const estado = filtroEstado.value;
 
   const filtrados = registros.filter((r) => {
+    // Un maestro solo ve los exámenes de su propia academia; un admin ve
+    // todas (y puede acotar con el filtro de academia).
+    if (!esAdminActual && perfilActual && r.academiaId !== perfilActual.academiaId) return false;
+    if (esAdminActual && academia && r.academia !== academia) return false;
     if (periodo && r.periodo !== periodo) return false;
-    if (academia && r.academia !== academia) return false;
     if (tipo && r.tipo !== tipo) return false;
     if (estado === "entregado" && !r.entregado) return false;
     if (estado === "pendiente" && r.entregado) return false;
@@ -333,7 +340,11 @@ function render() {
     })
     .join("");
 
-  contador.textContent = `${filtrados.length} de ${registros.length} registro(s)`;
+  const totalVisible =
+    esAdminActual || !perfilActual
+      ? registros.length
+      : registros.filter((r) => r.academiaId === perfilActual.academiaId).length;
+  contador.textContent = `${filtrados.length} de ${totalVisible} registro(s)`;
 }
 
 tbody.addEventListener("click", (e) => {
