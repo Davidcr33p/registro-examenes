@@ -1,12 +1,12 @@
-import { db, auth } from "./firebase.js?v=20260824145926";
-import { alCambiarSesion, esAdmin } from "./auth.js?v=20260824145926";
+import { db, auth } from "./firebase.js?v=20260824150859";
+import { alCambiarSesion, esAdmin } from "./auth.js?v=20260824150859";
 import {
   escucharAcademias,
   crearAcademia,
   agregarMateria,
   quitarMateria,
   eliminarAcademia
-} from "./academias.js?v=20260824145926";
+} from "./academias.js?v=20260824150859";
 import {
   collection,
   doc,
@@ -65,6 +65,10 @@ formNuevaAcademia.addEventListener("submit", async (e) => {
   formNuevaAcademia.reset();
 });
 
+const OPCIONES_SEMESTRE = [1, 2, 3, 4, 5, 6]
+  .map((s) => `<option value="${s}">${s}° semestre</option>`)
+  .join("");
+
 escucharAcademias((academias) => {
   academiasActuales = academias;
   listaAcademiasAdmin.innerHTML = academias
@@ -77,15 +81,22 @@ escucharAcademias((academias) => {
       </div>
       <ul class="lista-materias">
         ${(a.materias || [])
+          .slice()
+          .sort((m1, m2) => m1.semestre - m2.semestre)
           .map(
-            (m) => `<li>${escapeHtml(m)} <button class="btn-quitar-materia" data-id="${a.id}" data-materia="${escapeHtml(
-              m
-            )}">✕</button></li>`
+            (m) => `<li>
+              <span>${escapeHtml(m.nombre)} <span class="etiqueta-semestre">${m.semestre}° sem.</span></span>
+              <button class="btn-quitar-materia" data-id="${a.id}" data-nombre="${escapeHtml(m.nombre)}" data-semestre="${m.semestre}">✕</button>
+            </li>`
           )
           .join("") || '<li class="lista-materias-vacia">Sin materias todavía</li>'}
       </ul>
       <form class="form-nueva-materia" data-id="${a.id}">
         <input type="text" placeholder="Nueva materia" required>
+        <select required>
+          <option value="" disabled selected>Semestre</option>
+          ${OPCIONES_SEMESTRE}
+        </select>
         <button type="submit" class="btn-secundario">Agregar</button>
       </form>
     </article>
@@ -99,9 +110,11 @@ listaAcademiasAdmin.addEventListener("submit", async (e) => {
   if (!form) return;
   e.preventDefault();
   const input = form.querySelector("input");
-  const materia = input.value.trim();
-  if (!materia) return;
-  await agregarMateria(form.dataset.id, materia);
+  const select = form.querySelector("select");
+  const nombre = input.value.trim();
+  const semestre = Number(select.value);
+  if (!nombre || !semestre) return;
+  await agregarMateria(form.dataset.id, { nombre, semestre });
   form.reset();
 });
 
@@ -109,7 +122,10 @@ listaAcademiasAdmin.addEventListener("click", async (e) => {
   const btnQuitar = e.target.closest(".btn-quitar-materia");
   const btnEliminarAcademia = e.target.closest(".btn-eliminar-academia");
   if (btnQuitar) {
-    await quitarMateria(btnQuitar.dataset.id, btnQuitar.dataset.materia);
+    await quitarMateria(btnQuitar.dataset.id, {
+      nombre: btnQuitar.dataset.nombre,
+      semestre: Number(btnQuitar.dataset.semestre)
+    });
   }
   if (btnEliminarAcademia) {
     if (confirm("¿Eliminar esta academia y todas sus materias del catálogo?")) {
@@ -142,9 +158,15 @@ formGenerarPeriodo.addEventListener("submit", async (e) => {
     for (const academia of academiasActuales) {
       for (const materia of academia.materias || []) {
         for (const tipo of ["A", "B"]) {
-          const clave = `${academia.id}|${materia}|${tipo}`;
+          const clave = `${academia.id}|${materia.nombre}|${tipo}`;
           if (existentes.has(clave)) continue;
-          nuevos.push({ academiaId: academia.id, academia: academia.nombre, materia, tipo });
+          nuevos.push({
+            academiaId: academia.id,
+            academia: academia.nombre,
+            materia: materia.nombre,
+            semestre: materia.semestre,
+            tipo
+          });
         }
       }
     }

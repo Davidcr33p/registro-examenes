@@ -1,5 +1,5 @@
-import { db, auth } from "./firebase.js?v=20260824145926";
-import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824145926";
+import { db, auth } from "./firebase.js?v=20260824150859";
+import { DOMINIO_INSTITUCIONAL } from "./auth-config.js?v=20260824150859";
 import {
   registrarMaestro,
   iniciarSesion,
@@ -8,8 +8,8 @@ import {
   obtenerPerfilMaestro,
   esAdmin,
   alCambiarSesion
-} from "./auth.js?v=20260824145926";
-import { escucharAcademias } from "./academias.js?v=20260824145926";
+} from "./auth.js?v=20260824150859";
+import { escucharAcademias } from "./academias.js?v=20260824150859";
 import {
   collection,
   onSnapshot,
@@ -52,6 +52,7 @@ const avisoAdmin = document.getElementById("aviso-admin");
 const tbody = document.getElementById("tabla-registros-body");
 const filtroPeriodo = document.getElementById("filtro-periodo");
 const filtroAcademia = document.getElementById("filtro-academia");
+const filtroSemestre = document.getElementById("filtro-semestre");
 const filtroTipo = document.getElementById("filtro-tipo");
 const filtroEstado = document.getElementById("filtro-estado");
 const contador = document.getElementById("contador-registros");
@@ -295,6 +296,7 @@ function formatearFecha(timestamp) {
 function render() {
   const periodo = filtroPeriodo.value;
   const academia = filtroAcademia.value;
+  const semestre = filtroSemestre.value;
   const tipo = filtroTipo.value;
   const estado = filtroEstado.value;
 
@@ -304,6 +306,7 @@ function render() {
     if (!esAdminActual && perfilActual && r.academiaId !== perfilActual.academiaId) return false;
     if (esAdminActual && academia && r.academia !== academia) return false;
     if (periodo && r.periodo !== periodo) return false;
+    if (semestre && String(r.semestre) !== semestre) return false;
     if (tipo && r.tipo !== tipo) return false;
     if (estado === "entregado" && !r.entregado) return false;
     if (estado === "pendiente" && r.entregado) return false;
@@ -329,6 +332,7 @@ function render() {
     <tr class="${r.entregado ? "fila-entregada" : ""}">
       <td>${escapeHtml(r.academia)}</td>
       <td>${escapeHtml(r.materia)}</td>
+      <td>${r.semestre ? `${r.semestre}°` : "—"}</td>
       <td><span class="badge badge-tipo-${escapeHtml(r.tipo)}">${escapeHtml(r.tipo)}</span></td>
       <td><span class="badge ${r.entregado ? "badge-entregado" : "badge-pendiente"}">${
         r.entregado ? "Entregado" : "Pendiente"
@@ -352,7 +356,9 @@ tbody.addEventListener("click", (e) => {
   if (btnToggle) marcarEntregado(btnToggle.dataset.id, btnToggle.dataset.entregado === "true");
 });
 
-[filtroPeriodo, filtroAcademia, filtroTipo, filtroEstado].forEach((el) => el.addEventListener("change", render));
+[filtroPeriodo, filtroAcademia, filtroSemestre, filtroTipo, filtroEstado].forEach((el) =>
+  el.addEventListener("change", render)
+);
 
 function escapeHtml(str) {
   const div = document.createElement("div");
